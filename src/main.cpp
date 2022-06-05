@@ -5,6 +5,15 @@
 using namespace CameraCalib;
 using namespace std;
 
+static std::map<std::string,
+                std::pair<std::string, CameraCalibMDC::mdc_camera_model_e>>
+    cameras_map = {{"left_rear", {"A1", CameraCalibMDC::IMX728}},
+                   {"right_rear", {"A2", CameraCalibMDC::IMX728}},
+                   {"front_fisheye", {"C1", CameraCalibMDC::tte_IMX390}},
+                   {"rear_fisheye", {"C2", CameraCalibMDC::tte_IMX390}},
+                   {"left_fisheye", {"C3", CameraCalibMDC::tte_IMX390}},
+                   {"right_fisheye", {"C4", CameraCalibMDC::tte_IMX390}}};
+
 long ReadData(std::string slotName, char *readBuf, uint32_t maxReadLength) {
   long reads;
   if (!readBuf) {
@@ -26,29 +35,31 @@ long ReadData(std::string slotName, char *readBuf, uint32_t maxReadLength) {
 }
 
 int main(int argc, char *argv[]) {
-  CameraCalibMDCPtr camera_calib =
-      std::make_shared<CameraCalibMDC>("front_far");
-  std::shared_ptr<char> A1_EEPROMBinData(new char[20480]);
-  long A1_EEPROMBinDataSize = 0;
+  for (auto it = cameras_map.begin(); it != cameras_map.end(); it++) {
+    cout << it->first << ':' << it->second.first << ':' << it->second.second
+         << endl;
+    CameraCalibMDCPtr camera_calib =
+        std::make_shared<CameraCalibMDC>(it->first);
+    std::shared_ptr<char> EEPROMBinData(new char[20480]);
+    long EEPROMBinDataSize = 0;
+    EEPROMBinDataSize =
+        ReadData(it->second.first, EEPROMBinData.get(), 20480 - 1);
+    if (EEPROMBinDataSize <= 0) {
+      cout << "read EEPROMBin failed" << endl;
+      continue;
+    } else
+      cout << "read from bin gets " << EEPROMBinDataSize << endl;
 
-  cout << "camera tag is " << camera_calib->GetCameraTag() << endl;
-  camera_calib->InitCamera(2896, 1876, false);
-  camera_calib->LoadCalibFromFileYaml(
-      "/home/zhangdonghua/Downloads/camera_front_far.yaml");
-  camera_calib->LoadCalibFromEEPROM();
-  if (camera_calib->IsCameraChanged()) cout << "camera changed ! " << endl;
-  if (!camera_calib->IsCalibFileOK()) cout << "calib file broken ! " << endl;
-  camera_calib->WriteCalibToFileYaml("./output.yaml");
-
-  A1_EEPROMBinDataSize = ReadData("A1", A1_EEPROMBinData.get(), 20480 - 1);
-  if (A1_EEPROMBinDataSize > 0) {
-    cout << "read from bin gets " << A1_EEPROMBinDataSize << endl;
-    for (int i = 0; i < A1_EEPROMBinDataSize; i++) {
-      cout << std::hex << (int)*(A1_EEPROMBinData.get() + i) << ' ';
-    }
-    cout << endl;
-  } else
-    cout << "read EEPROMBin failed" << endl;
+    camera_calib->InitCamera(2896, 1876, false);
+    camera_calib->LoadCalibFromFileYaml(
+        "/home/zhangdonghua/Downloads/camera_front_far.yaml");
+    camera_calib->LoadCalibFromEEPROM(it->second.second, EEPROMBinData.get(),
+                                      EEPROMBinDataSize);
+    if (camera_calib->IsCameraChanged()) cout << "camera changed ! " << endl;
+    if (!camera_calib->IsCalibFileOK()) cout << "calib file broken ! " << endl;
+    auto output_path = "./output_" + it->second.first + ".yaml";
+    camera_calib->WriteCalibToFileYaml(output_path.c_str());
+  }
 
   return 0;
 }

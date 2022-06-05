@@ -1,4 +1,6 @@
+#include <arpa/inet.h>
 #include <stdio.h>
+#include <string.h>
 #include <fstream>
 #include <iostream>
 #include "yaml-cpp/yaml.h"
@@ -331,6 +333,21 @@ class CameraCalibCommon {
     char tmp[64];
     sprintf(tmp, "%f", src);
     strdst = tmp;
+  };
+  double htonll(double val) {
+    return (((int64_t)htonl((int32_t)val) << 32) + htonl((int64_t)val >> 32));
+  };
+  double EndianSwap(double d) {
+    char ch[8];
+    memcpy(ch, &d, 8);
+    ch[0] ^= ch[7] ^= ch[0] ^= ch[7];
+    ch[1] ^= ch[6] ^= ch[1] ^= ch[6];
+    ch[2] ^= ch[5] ^= ch[2] ^= ch[5];
+    ch[3] ^= ch[4] ^= ch[3] ^= ch[4];
+
+    double dRet;
+    memcpy(&dRet, ch, 8);
+    return dRet;
   };
 
  protected:
