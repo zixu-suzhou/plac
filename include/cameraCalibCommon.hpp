@@ -334,9 +334,6 @@ class CameraCalibCommon {
     sprintf(tmp, "%f", src);
     strdst = tmp;
   };
-  double htonll(double val) {
-    return (((int64_t)htonl((int32_t)val) << 32) + htonl((int64_t)val >> 32));
-  };
   double EndianSwap(double d) {
     char ch[8];
     memcpy(ch, &d, 8);
