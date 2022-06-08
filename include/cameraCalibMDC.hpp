@@ -111,8 +111,8 @@ class CameraCalibMDC : public CameraCalibCommon {
                   << std::endl;
         m_EEPROMParam.fx =EndianSwap(EEPROMCalibPtr->fx);
         m_EEPROMParam.fy =EndianSwap(EEPROMCalibPtr->fy);
-        m_EEPROMParam.cx =EndianSwap(EEPROMCalibPtr->cx);
-        m_EEPROMParam.cy =EndianSwap(EEPROMCalibPtr->cy);
+        m_EEPROMParam.cx =(double)1920 - EndianSwap(EEPROMCalibPtr->cx);
+        m_EEPROMParam.cy =(double)1200 - EndianSwap(EEPROMCalibPtr->cy);
         m_EEPROMParam.k1 =EndianSwap(EEPROMCalibPtr->k1);
         m_EEPROMParam.k2 =EndianSwap(EEPROMCalibPtr->k2);
         m_EEPROMParam.k3 =EndianSwap(EEPROMCalibPtr->k3);
