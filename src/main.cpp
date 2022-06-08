@@ -7,7 +7,7 @@ using namespace std;
 
 static std::map<std::string,
                 std::pair<std::string, CameraCalibMDC::mdc_camera_model_e>>
-    cameras_map = {{"left_rear", {"A1", CameraCalibMDC::IMX728}},
+    cameras_map = {{"front_far", {"A1", CameraCalibMDC::IMX728}},
                    {"right_rear", {"A2", CameraCalibMDC::IMX728}},
                    {"front_fisheye", {"C1", CameraCalibMDC::tte_IMX390}},
                    {"rear_fisheye", {"C2", CameraCalibMDC::tte_IMX390}},
@@ -50,9 +50,14 @@ int main(int argc, char *argv[]) {
     } else
       cout << "read from bin gets " << EEPROMBinDataSize << endl;
 
-    camera_calib->InitCamera(2896, 1876, false);
-    camera_calib->LoadCalibFromFileYaml(
-        "/home/zhangdonghua/Downloads/camera_front_far.yaml");
+    if (it->second.second == CameraCalibMDC::tte_IMX390) {
+      camera_calib->InitCamera(1920, 1200, true);
+    } else {
+      camera_calib->InitCamera(3840, 2160, false);
+    }
+    auto calib_file_path =
+        "./camera_" + it->first + ".yaml";
+    camera_calib->LoadCalibFromFileYaml(calib_file_path.c_str());
     camera_calib->LoadCalibFromEEPROM(it->second.second, EEPROMBinData.get(),
                                       EEPROMBinDataSize);
     if (camera_calib->IsCameraChanged()) cout << "camera changed ! " << endl;
