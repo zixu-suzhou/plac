@@ -16,18 +16,20 @@ static std::map<std::string,
 
 long ReadData(std::string slotName, char *readBuf, uint32_t maxReadLength) {
   long reads;
-  if (!readBuf) {
+  if (!readBuf || maxReadLength <= 0 || slotName.empty()) {
     return -1;
   }
-  std::string name = "./" + slotName + ".bin";
+
+  std::string name = "./" + slotName + ".bin";  
   std::ifstream stream(name, ios::in | ios::binary | ios::ate);
   if (!stream.is_open()) {
     std::cout << name << " open failed!" << std::endl;
     return -1;
   }
-  reads = stream.tellg();
+  
+  reads = stream.tellg(); 
   if (reads > maxReadLength) reads = maxReadLength;
-  stream.seekg(0, ios::beg);
+  stream.seekg(0, ios::beg); 
   stream.read(readBuf, reads);
   stream.close();
 
@@ -39,11 +41,11 @@ int main(int argc, char *argv[]) {
     cout << it->first << ':' << it->second.first << ':' << it->second.second
          << endl;
     CameraCalibMDCPtr camera_calib =
-        std::make_shared<CameraCalibMDC>(it->first);
-    std::shared_ptr<char> EEPROMBinData(new char[20480]);
+        std::make_shared<CameraCalibMDC>(it->first);        
+    std::shared_ptr<char> EEPROMBinData(new char[20480]); 
     long EEPROMBinDataSize = 0;
     EEPROMBinDataSize =
-        ReadData(it->second.first, EEPROMBinData.get(), 20480 - 1);
+        ReadData(it->second.first, EEPROMBinData.get(), 20480 - 1); 
     if (EEPROMBinDataSize <= 0) {
       cout << "read EEPROMBin failed" << endl;
       continue;

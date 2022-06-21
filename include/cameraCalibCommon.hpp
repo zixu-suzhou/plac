@@ -64,19 +64,19 @@ struct YAML::convert<Roi> {
 namespace CameraCalib {
 
 typedef struct _CALIB_PARA {
-  float fx;
-  float fy;
-  float cx;
-  float cy;
-  float dummy1;
-  float dummy2;
-  float dummy3;
-  float k1;
-  float k2;
-  float dummy4;
-  float dummy5;
-  float k3;
-  float k4;
+  double fx;
+  double fy;
+  double cx;
+  double cy;
+  double dummy1;
+  double dummy2;
+  double dummy3;
+  double k1;
+  double k2;
+  double dummy4;
+  double dummy5;
+  double k3;
+  double k4;
 } CALIB_PARA;
 typedef struct _STRING_CALIB_PARA {
   std::string strfx;
@@ -234,7 +234,7 @@ class CameraCalibCommon {
         << YAML::Key << "vehicle_xyz" << YAML::Value << YAML::DoubleQuoted
         << m_yamlNode["vehicle_xyz"]
         << YAML::Comment(
-               "车体系定义, 前左上, 后轴中心接地点");  // -- 车体坐标系方向定义
+               "车体系定义, 前左上, 后轴中心接地点"); 
 
     yaml_emitter
         << YAML::Key << "r_s2b"
@@ -329,11 +329,19 @@ class CameraCalibCommon {
     } else
       return false;
   };
+
   void FloatToString(std::string &strdst, float src) {
     char tmp[64];
     sprintf(tmp, "%f", src);
     strdst = tmp;
   };
+
+  void DoubleToString(std::string &strdst, double src) {
+    char tmp[128];
+    sprintf(tmp, "%.15lf", src);
+    strdst = tmp;
+  };
+
   double EndianSwap(double d) {
     char ch[8];
     memcpy(ch, &d, 8);
@@ -361,4 +369,4 @@ class CameraCalibCommon {
  private:
   std::string m_cameraName;
 };
-}  // namespace CameraCalib
+}  

@@ -57,7 +57,15 @@ class CameraCalibMDC : public CameraCalibCommon {
   uint8_t LoadCalibFromEEPROM() { return 0; }
   uint8_t LoadCalibFromEEPROM(mdc_camera_model_e camera, char *bin,
                               long length) {
+    if (!bin || length <= 0){
+      return -1;
+    }
+
     if (camera == IMX728) {
+      if (length < (CAMERA_CALIB_BASE_OFFSET + sizeof(IMX728_EEPROMCalib_t))){
+        return -1;
+      }
+
       char *p = bin + CAMERA_CALIB_BASE_OFFSET;
       IMX728_EEPROMCalib_t *EEPROMCalibPtr;
 
@@ -86,6 +94,10 @@ class CameraCalibMDC : public CameraCalibCommon {
       m_EEPROMParam.k4 = EEPROMCalibPtr->k4;
 
     } else if (camera == tte_IMX390) {
+      if (length < (sizeof(TTE_EEPROMCalib_t))){
+        return -1;
+      }
+
       char *p = bin;
       TTE_EEPROMCalib_t *EEPROMCalibPtr;
 
@@ -141,14 +153,14 @@ class CameraCalibMDC : public CameraCalibCommon {
       return -1;
     }
 
-    FloatToString(m_EEPROMStrParam.strfx, m_EEPROMParam.fx);
-    FloatToString(m_EEPROMStrParam.strfy, m_EEPROMParam.fy);
-    FloatToString(m_EEPROMStrParam.strcx, m_EEPROMParam.cx);
-    FloatToString(m_EEPROMStrParam.strcy, m_EEPROMParam.cy);
-    FloatToString(m_EEPROMStrParam.strk1, m_EEPROMParam.k1);
-    FloatToString(m_EEPROMStrParam.strk2, m_EEPROMParam.k2);
-    FloatToString(m_EEPROMStrParam.strk3, m_EEPROMParam.k3);
-    FloatToString(m_EEPROMStrParam.strk4, m_EEPROMParam.k4);
+    DoubleToString(m_EEPROMStrParam.strfx, m_EEPROMParam.fx);
+    DoubleToString(m_EEPROMStrParam.strfy, m_EEPROMParam.fy);
+    DoubleToString(m_EEPROMStrParam.strcx, m_EEPROMParam.cx);
+    DoubleToString(m_EEPROMStrParam.strcy, m_EEPROMParam.cy);
+    DoubleToString(m_EEPROMStrParam.strk1, m_EEPROMParam.k1);
+    DoubleToString(m_EEPROMStrParam.strk2, m_EEPROMParam.k2);
+    DoubleToString(m_EEPROMStrParam.strk3, m_EEPROMParam.k3);
+    DoubleToString(m_EEPROMStrParam.strk4, m_EEPROMParam.k4);
 
     return 0;
   };
@@ -158,4 +170,4 @@ class CameraCalibMDC : public CameraCalibCommon {
 };
 
 using CameraCalibMDCPtr = std::shared_ptr<CameraCalibMDC>;
-}  // namespace CameraCalib
+}
