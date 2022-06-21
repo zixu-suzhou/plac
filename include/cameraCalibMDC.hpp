@@ -55,8 +55,16 @@ class CameraCalibMDC : public CameraCalibCommon {
   } IMX728_EEPROMCalib_t;
   CameraCalibMDC(std::string camera_name) : CameraCalibCommon(camera_name){};
   uint8_t LoadCalibFromEEPROM() { return 0; }
-  uint8_t LoadCalibFromEEPROM(mdc_camera_model_e camera, char *bin,
+  uint8_t LoadCalibFromEEPROM(mdc_camera_model_e camera, const void *bin_t,
                               long length) {
+    if (!bin_t){
+      return -1;
+    }
+    if (length <= 0)  // length在后面没用到
+      return -1;
+
+    char *bin = (char *) bin_t;
+
     if (camera == IMX728) {
       char *p = bin + CAMERA_CALIB_BASE_OFFSET;
       IMX728_EEPROMCalib_t *EEPROMCalibPtr;
@@ -140,7 +148,7 @@ class CameraCalibMDC : public CameraCalibCommon {
       std::cout << "not supported camera model" << camera << std::endl;
       return -1;
     }
-
+#if 0
     FloatToString(m_EEPROMStrParam.strfx, m_EEPROMParam.fx);
     FloatToString(m_EEPROMStrParam.strfy, m_EEPROMParam.fy);
     FloatToString(m_EEPROMStrParam.strcx, m_EEPROMParam.cx);
@@ -149,6 +157,15 @@ class CameraCalibMDC : public CameraCalibCommon {
     FloatToString(m_EEPROMStrParam.strk2, m_EEPROMParam.k2);
     FloatToString(m_EEPROMStrParam.strk3, m_EEPROMParam.k3);
     FloatToString(m_EEPROMStrParam.strk4, m_EEPROMParam.k4);
+#endif
+    DoubleToString(m_EEPROMStrParam.strfx, m_EEPROMParam.fx);
+    DoubleToString(m_EEPROMStrParam.strfy, m_EEPROMParam.fy);
+    DoubleToString(m_EEPROMStrParam.strcx, m_EEPROMParam.cx);
+    DoubleToString(m_EEPROMStrParam.strcy, m_EEPROMParam.cy);
+    DoubleToString(m_EEPROMStrParam.strk1, m_EEPROMParam.k1);
+    DoubleToString(m_EEPROMStrParam.strk2, m_EEPROMParam.k2);
+    DoubleToString(m_EEPROMStrParam.strk3, m_EEPROMParam.k3);
+    DoubleToString(m_EEPROMStrParam.strk4, m_EEPROMParam.k4);
 
     return 0;
   };
