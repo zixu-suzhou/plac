@@ -234,7 +234,7 @@ class CameraCalibCommon {
         << YAML::Key << "vehicle_xyz" << YAML::Value << YAML::DoubleQuoted
         << m_yamlNode["vehicle_xyz"]
         << YAML::Comment(
-               "车体系定义, 前左上, 后轴中心接地点");  // -- 车体坐标系方向定义
+               "车体系定义, 前左上, 后轴中心接地点"); 
 
     yaml_emitter
         << YAML::Key << "r_s2b"
@@ -329,16 +329,16 @@ class CameraCalibCommon {
     } else
       return false;
   };
-#if 0
+
   void FloatToString(std::string &strdst, float src) {
     char tmp[64];
     sprintf(tmp, "%f", src);
     strdst = tmp;
   };
-#endif
+
   void DoubleToString(std::string &strdst, double src) {
     char tmp[128];
-    sprintf(tmp, "%lf", src);
+    sprintf(tmp, "%.15lf", src);
     strdst = tmp;
   };
 
@@ -369,4 +369,4 @@ class CameraCalibCommon {
  private:
   std::string m_cameraName;
 };
-}  // namespace CameraCalib
+}  
